@@ -1,65 +1,45 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:beautiful_list/model/lesson.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
+import 'package:path_provider/path_provider.dart';
 
-class DetailPage extends StatelessWidget {
-  final Lesson lesson;
+class DetailPage extends StatefulWidget {
   DetailPage({Key key, this.lesson}) : super(key: key);
+  final Lesson lesson;
+
+  @override
+  _DetailPageState createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  Future<String> prepareTestPdf() async {
+    final ByteData bytes =
+        await DefaultAssetBundle.of(context).load('PDFs/01.pdf');
+    final Uint8List list = bytes.buffer.asUint8List();
+
+    final tempDir = await getTemporaryDirectory();
+    final tempDocumentPath = '${tempDir.path}/PDFs/01.pdf';
+
+    final file = await File(tempDocumentPath).create(recursive: true);
+    file.writeAsBytesSync(list);
+    return tempDocumentPath;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final levelIndicator = Container(
-      child: Container(
-        child: LinearProgressIndicator(
-            backgroundColor: Color.fromRGBO(209, 224, 224, 0.2),
-            value: lesson.indicatorValue,
-            valueColor: AlwaysStoppedAnimation(Colors.green)),
-      ),
-    );
-
-    final coursePrice = Container(
-      padding: const EdgeInsets.all(7.0),
-      decoration: new BoxDecoration(
-          border: new Border.all(color: Colors.white),
-          borderRadius: BorderRadius.circular(5.0)),
-      child: new Text(
-        "\$" + lesson.price.toString(),
-        style: TextStyle(color: Colors.white),
-      ),
-    );
-
     final topContentText = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(height: 120.0),
-        Icon(
-          Icons.directions_car,
-          color: Colors.white,
-          size: 40.0,
-        ),
-        Container(
-          width: 90.0,
-          child: new Divider(color: Colors.green),
-        ),
         SizedBox(height: 10.0),
         Text(
-          lesson.title,
+          widget.lesson.title,
           style: TextStyle(color: Colors.white, fontSize: 45.0),
         ),
         SizedBox(height: 30.0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Expanded(flex: 1, child: levelIndicator),
-            Expanded(
-                flex: 6,
-                child: Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      lesson.level,
-                      style: TextStyle(color: Colors.white),
-                    ))),
-            Expanded(flex: 1, child: coursePrice)
-          ],
-        ),
       ],
     );
 
@@ -70,8 +50,9 @@ class DetailPage extends StatelessWidget {
             height: MediaQuery.of(context).size.height * 0.5,
             decoration: new BoxDecoration(
               image: new DecorationImage(
-                image: new AssetImage("drive-steering-wheel.jpg"),
+                image: new AssetImage("bg.jpg"),
                 fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
               ),
             )),
         Container(
@@ -97,17 +78,31 @@ class DetailPage extends StatelessWidget {
     );
 
     final bottomContentText = Text(
-      lesson.content,
+      widget.lesson.content,
       style: TextStyle(fontSize: 18.0),
     );
     final readButton = Container(
         padding: EdgeInsets.symmetric(vertical: 16.0),
         width: MediaQuery.of(context).size.width,
         child: RaisedButton(
-          onPressed: () => {},
+          // onPressed: () => {},
+          onPressed: () {
+            print('asdf');
+            prepareTestPdf().then((path) {
+              print(path);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FullPdfViewerScreen(path)),
+              );
+            });
+          },
+          // onPressed: () => Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => PDFScreen(pathPDF)),
+          // ),
           color: Color.fromRGBO(58, 66, 86, 1.0),
-          child:
-              Text("TAKE THIS LESSON", style: TextStyle(color: Colors.white)),
+          child: Text("Música", style: TextStyle(color: Colors.white)),
         ));
     final bottomContent = Container(
       width: MediaQuery.of(context).size.width,
@@ -120,9 +115,24 @@ class DetailPage extends StatelessWidget {
     );
 
     return Scaffold(
-      body: Column(
+      body: ListView(
         children: <Widget>[topContent, bottomContent],
       ),
     );
+  }
+}
+
+class FullPdfViewerScreen extends StatelessWidget {
+  final String pdfPath;
+
+  FullPdfViewerScreen(this.pdfPath);
+
+  @override
+  Widget build(BuildContext context) {
+    return PDFViewerScaffold(
+        appBar: AppBar(
+          title: Text("Document"),
+        ),
+        path: pdfPath);
   }
 }

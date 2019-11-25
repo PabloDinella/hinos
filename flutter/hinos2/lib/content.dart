@@ -8,8 +8,32 @@ List getLessons() {
         level: "Beginner",
         indicatorValue: 0.33,
         price: 20,
-        content:
-            "strofe 1\n\nasdf 2"),
+        content: """Aba-Pai, a Ti chegamos
+no bom nome do Senhor.
+Com prazer, ó Pia, recebes
+dos Teus filhos o louvor.
+Nesta mesa reunidos
+por Quem para nós morreu,
+contemplando, adorando,
+Teu amor que nos remiu.
+
+Nós, que outrora sendo escravos
+do pecado e maldição,
+ei-nos como a mados filhos,
+sob a Tua compaixão!
+Transportados para o reino
+do Teu Filho de amor,
+somos no Ressuscitado,
+gozo do teu coração.
+
+Eis que em nós aqui reunidos,
+podem anjos contemplar
+maravilhas dos tesouros,
+do Teu rico amor sem par.
+Aba-Pai! Sejas louvado
+sempre por Jesus, Senhor!
+Sejas sempre engrandecido,
+Tu que és Deus de luz e amor."""),
     Lesson(
         number: '2',
         title: "Observation at Junctions",
